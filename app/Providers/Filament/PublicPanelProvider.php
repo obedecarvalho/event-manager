@@ -2,8 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\CategoryResource;
-use App\Filament\Resources\EventResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -20,34 +18,28 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AppPanelProvider extends PanelProvider
+class PublicPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('app')
-            ->path('app')
-            ->login()
-            ->registration()
-            ->passwordReset()
-            ->profile()
+            ->id('public')
+            ->path('')
             ->colors([
                 'primary' => Color::Blue,
             ])
-            //->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            //->discoverResources(in: app_path('Filament/Public/Resources'), for: 'App\\Filament\\Public\\Resources')
             ->resources([
-                EventResource::class,
-                CategoryResource::class,
+
             ])
-            //->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            //->discoverPages(in: app_path('Filament/Public/Pages'), for: 'App\\Filament\\Public\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            //->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            //->discoverWidgets(in: app_path('Filament/Public/Widgets'), for: 'App\\Filament\\Public\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                //Widgets\AccountWidget::class,
+                //Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -60,12 +52,10 @@ class AppPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([
+            /*->authMiddleware([
                 Authenticate::class,
-            ])
-            ->sidebarFullyCollapsibleOnDesktop()
-            ->unsavedChangesAlerts()
-            ->databaseNotifications()
+                ])*/
+            ->topNavigation()
             ;
     }
 }

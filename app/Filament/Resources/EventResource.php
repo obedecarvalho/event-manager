@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Filament\Resources\EventResource\RelationManagers;
 use App\Models\Event;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +18,9 @@ class EventResource extends Resource
 {
     protected static ?string $model = Event::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+
+    protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
@@ -29,25 +32,40 @@ class EventResource extends Resource
         return __('Events');
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Event');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->columnSpanFull()
                     ->required(),
-                Forms\Components\TextInput::make('description')
+                Forms\Components\RichEditor::make('description')
+                    ->columnSpanFull()
                     ->required(),
                 Forms\Components\Toggle::make('is_public')
                     ->label(__('Public'))
+                    ->columnSpanFull()
                     ->required(),
                 Forms\Components\DateTimePicker::make('start_at')
-                    ->required(),
+                    ->required()
+                    ->timezone('America/Sao_Paulo')
+                    ->seconds(false),
                 Forms\Components\DateTimePicker::make('end_at')
-                    ->required(),
-                Forms\Components\TextInput::make('latitude')
-                    ->numeric(),
-                Forms\Components\TextInput::make('longitude')
-                    ->numeric(),
+                    ->required()
+                    ->seconds(false)
+                    ->timezone('America/Sao_Paulo')
+                    ->after('start_at'),
+                Forms\Components\Select::make('categories')
+                    ->relationship('categories', 'description')
+                    ->required()
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ]);
     }
 
@@ -58,10 +76,22 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('is_public')
-                    ->label(__('Public'))
-                    ->boolean(),
+                    ->searchable()
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
+                Tables\Columns\BadgeColumn::make('categories.description')
+                    ->limitList(3),
+                Tables\Columns\ToggleColumn::make('is_public')
+                    ->label(__('Public')),
                 Tables\Columns\TextColumn::make('start_at')
                     ->dateTime()
                     ->sortable(),
@@ -88,6 +118,44 @@ class EventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\MultiSelectFilter::make('categories')
+                    ->relationship('categories', 'description')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\TernaryFilter::make('is_public')
+                    ->label(__('Public'))
+                    ->placeholder(__('All')),
+                Tables\Filters\Filter::make('start_at')
+                    ->indicateUsing(function (array $data): ?string {
+                        if ($data['start_from'] && $data['start_until']) {
+                            return __('Start between') . ' ' . 
+                                Carbon::parse($data['start_from'])->toFormattedDateString() . 
+                                ' ' . __('and') . ' ' . 
+                                Carbon::parse($data['start_until'])->toFormattedDateString();
+                        }
+                        if ($data['start_from']) {
+                            return __('Start from') . ' ' . Carbon::parse($data['start_from'])->toFormattedDateString();
+                        }
+                        if ($data['start_until']) {
+                            return __('Start until') . ' ' . Carbon::parse($data['start_until'])->toFormattedDateString();
+                        }
+                        return null;
+                    })
+                    ->form([
+                        Forms\Components\DatePicker::make('start_from'),
+                        Forms\Components\DatePicker::make('start_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['start_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('start_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['start_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('start_at', '<=', $date),
+                            );
+                    }),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([

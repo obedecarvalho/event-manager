@@ -2,12 +2,13 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\CategoryResource;
-use App\Filament\Resources\EventResource;
+use App\Support\Enum\Roles;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -19,32 +20,30 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Rmsramos\Activitylog\ActivitylogPlugin;
 
-class AppPanelProvider extends PanelProvider
+class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('app')
-            ->path('app')
+            ->id('admin')
+            ->path('admin')
             ->login()
-            ->registration()
             ->passwordReset()
             ->profile()
             ->colors([
                 'primary' => Color::Blue,
             ])
-            //->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->resources([
-                EventResource::class,
-                CategoryResource::class,
+
             ])
-            //->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            //->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -62,6 +61,32 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                ActivitylogPlugin::make()
+                    ->navigationGroup(__('Administration'))
+                    ->label(__('Activity Log'))
+                    ->pluralLabel(__('Activities Log'))
+                    ->isRestoreActionHidden(true)
+                    ->isResourceActionHidden(true)
+                    ->authorize(
+                        fn () => auth()->user()->hasRole(Roles::getRolesUserManager())
+                    ),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->collapsible(false)
+                    ->label(__('Event')),
+                NavigationGroup::make()
+                    ->label(__('Administration')),
+            ])
+            ->navigationItems([
+                NavigationItem::make('Pulse')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->group(__('Administration'))
+                    ->url('/pulse', true)
+                    ->visible(fn(): bool => auth()->user()->hasRole(Roles::ADMIN->name))
+                    ,
             ])
             ->sidebarFullyCollapsibleOnDesktop()
             ->unsavedChangesAlerts()
