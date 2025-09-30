@@ -4,12 +4,16 @@ namespace Database\Factories;
 
 use DateInterval;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Mtvs\EloquentApproval\ApprovalFactoryStates;
+use Mtvs\EloquentApproval\ApprovalStatuses;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Event>
  */
 class EventFactory extends Factory
 {
+    use ApprovalFactoryStates;
+    
     /**
      * Define the model's default state.
      *
@@ -31,4 +35,13 @@ class EventFactory extends Factory
             'longitude' => fake()->longitude(max: -44.965, min:-45.02),
         ];
     }
+
+    public function withRandomApprovalState()
+	{
+		return $this->state(function ()
+		{
+            $status = fake()->randomElement([ApprovalStatuses::APPROVED, ApprovalStatuses::PENDING, ApprovalStatuses::REJECTED]);
+			return $this->approvalState($status);
+		});
+	}
 }

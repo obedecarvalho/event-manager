@@ -4,6 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EventResource\Pages;
 use App\Filament\Resources\EventResource\RelationManagers;
+use App\Filament\Tables\Columns\ApprovalBadgeColumn;
+use App\Filament\Tables\Columns\ApprovalIconColumn;
+use App\Filament\Tables\Filters\ApprovalFilter;
 use App\Models\Event;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -13,6 +16,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Mtvs\EloquentApproval\ApprovalScope;
+use Mtvs\EloquentApproval\ApprovalStatuses;
 
 class EventResource extends Resource
 {
@@ -98,6 +103,39 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('end_at')
                     ->dateTime()
                     ->sortable(),
+                /*
+                Tables\Columns\IconColumn::make('approval_status')
+                    ->label(__('Approval status'))
+                    ->icon(fn(string $state) => 
+                        match($state) {
+                            ApprovalStatuses::APPROVED => 'heroicon-o-check-circle',
+                            ApprovalStatuses::REJECTED => 'heroicon-o-x-circle',
+                            ApprovalStatuses::PENDING => 'heroicon-o-clock',
+                        }
+                    )
+                    ->color(fn(string $state) => 
+                        match($state) {
+                            ApprovalStatuses::APPROVED => 'success',
+                            ApprovalStatuses::REJECTED => 'danger',
+                            ApprovalStatuses::PENDING => 'warning',
+                        }
+                    )
+                    ->tooltip(fn(string $state) => 
+                        match($state) {
+                            ApprovalStatuses::APPROVED => __('Approved'),
+                            ApprovalStatuses::REJECTED => __('Rejected'),
+                            ApprovalStatuses::PENDING => __('Pending'),
+                        }
+                    ),
+                */
+                ApprovalIconColumn::make('approval_status')
+                    ->label(__('Approval status'))
+                    ->alignCenter(),
+                /*
+                ApprovalBadgeColumn::make('approval_status')
+                    ->label(__('Approval status'))
+                    ->alignCenter(),
+                */
                 Tables\Columns\TextColumn::make('latitude')
                     ->numeric()
                     ->sortable(),
@@ -113,6 +151,10 @@ class EventResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('approval_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -156,6 +198,18 @@ class EventResource extends Resource
                                 fn(Builder $query, $date): Builder => $query->whereDate('start_at', '<=', $date),
                             );
                     }),
+                /*
+                Tables\Filters\MultiSelectFilter::make('approval_status')
+                    ->label(__('Approval status'))
+                    ->options([
+                        ApprovalStatuses::APPROVED => __('Approved'),
+                        ApprovalStatuses::REJECTED => __('Rejected'),
+                        ApprovalStatuses::PENDING => __('Pending'),
+                    ]),
+                */
+                ApprovalFilter::make('approval_status')
+                    ->multiple()
+                    ->label(__('Approval status')),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -193,6 +247,7 @@ class EventResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
+                ApprovalScope::class,
             ]);
     }
 }

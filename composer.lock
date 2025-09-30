@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5554e141301bc9deaeb6ae8c18df9ccf",
+    "content-hash": "d000d2f89d05435d7dc7dd57428ac63e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3618,6 +3618,73 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
+        },
+        {
+            "name": "mtvs/eloquent-approval",
+            "version": "v5.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/obedecarvalho/eloquent-approval.git",
+                "reference": "749482b2cd70868bee8194e06693b549ffc34b17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/obedecarvalho/eloquent-approval/zipball/749482b2cd70868bee8194e06693b549ffc34b17",
+                "reference": "749482b2cd70868bee8194e06693b549ffc34b17",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^8.3|^9.0|^10.0|^11.0|^12.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mtvs\\EloquentApproval\\ApprovalServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mtvs\\EloquentApproval\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Mtvs\\EloquentApproval\\Tests\\": "tests/",
+                    "Mtvs\\EloquentApproval\\Tests\\Database\\Factories\\": "tests/database/factories/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mohammad Ali Tavassoli",
+                    "email": "mtvs.dev@gmail.com"
+                }
+            ],
+            "description": "Approval process for Laravel Eloquent models.",
+            "keywords": [
+                "approval",
+                "eloquent",
+                "laravel"
+            ],
+            "support": {
+                "source": "https://github.com/obedecarvalho/eloquent-approval/tree/v5.2.2"
+            },
+            "time": "2025-09-24T19:06:15+00:00"
         },
         {
             "name": "nesbot/carbon",

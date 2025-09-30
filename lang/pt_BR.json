@@ -222,5 +222,10 @@
   "Password confirmation" : "Confirmação de senha",
   "Activity Log" : "Log de Atividade",
   "Activities Log" : "Logs de Atividade",
+  "Rejected" : "Rejeitado",
+  "Approved" : "Aprovado",
+  "Pending" : "Pendente",
+  "Approval status" : "Status avaliação",
+  "Approval at" : "Avaliado em",
   "Administration": "Administração"
 }
