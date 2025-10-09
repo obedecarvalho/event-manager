@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Guava\FilamentModalRelationManagers\Actions\Table\RelationManagerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -71,6 +72,14 @@ class UserResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('roles.name')
                     ->label(__('Role'))
+                    ->formatStateUsing(function ($state) {
+                        return __(
+                            Str::of($state)
+                                ->lower()
+                                ->headline()
+                                ->toString()
+                        );
+                    })
                     ->listWithLineBreaks(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

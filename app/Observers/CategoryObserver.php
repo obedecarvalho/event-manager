@@ -51,7 +51,6 @@ class CategoryObserver
 
     private function clearCache(): void
     {
-        Log::debug(__METHOD__);
         Cache::forget(CategoryService::CACHE_KEY_CATEGORY);
     }
 }

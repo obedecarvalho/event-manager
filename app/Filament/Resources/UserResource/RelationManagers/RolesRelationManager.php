@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class RolesRelationManager extends RelationManager
 {
@@ -29,7 +30,15 @@ class RolesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->formatStateUsing(function ($state) {
+                        return __(
+                            Str::of($state)
+                                ->lower()
+                                ->headline()
+                                ->toString()
+                        );
+                    }),
             ])
             ->filters([
                 //

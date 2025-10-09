@@ -16,7 +16,8 @@ class EventService
                 Infolists\Components\TextEntry::make('name')
                     ->label(__('Name')),
                 Infolists\Components\TextEntry::make('description')
-                    ->label(__('Description')),
+                    ->label(__('Description'))
+                    ->html(),
                 Infolists\Components\Grid::make(2)
                     ->schema([
                         Infolists\Components\TextEntry::make('start_at')

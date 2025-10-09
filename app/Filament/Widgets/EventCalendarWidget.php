@@ -10,6 +10,7 @@ use Guava\Calendar\Actions\ViewAction;
 use Guava\Calendar\ValueObjects\CalendarEvent;
 use Guava\Calendar\Widgets\CalendarWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
@@ -29,8 +30,6 @@ class EventCalendarWidget extends CalendarWidget
         
         $categoriesFilter = fluent($this->filters)->get('categories', []);
 
-        Log::debug(json_encode($categoriesFilter));
-
         $eventQuery = Event::query()
             ->where('end_at', '>=', $fetchInfo['start'])
             ->where('start_at', '<',  $fetchInfo['end'])
@@ -48,10 +47,12 @@ class EventCalendarWidget extends CalendarWidget
         $events = $eventQuery->get();
 
         return $events->map(function($event){
+            $start_at = Carbon::parse($event->start_at)->shiftTimezone('UTC');
+            $end_at = Carbon::parse($event->end_at)->shiftTimezone('UTC');
             return CalendarEvent::make()
                 ->title($event->name)
-                ->start($event->start_at)
-                ->end($event->end_at)
+                ->start($start_at)
+                ->end($end_at)
                 ->key($event->id)
                 ->model(Event::class);
         })->all();

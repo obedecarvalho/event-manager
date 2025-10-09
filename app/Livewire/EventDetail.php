@@ -37,7 +37,6 @@ class EventDetail extends Component implements HasForms, HasInfolists
     #[On('app:event:detail:open')]
     public function open(int $event_id)
     {
-        Log::debug('aqui');
         $event = Event::find($event_id);
 
         if ($event){
