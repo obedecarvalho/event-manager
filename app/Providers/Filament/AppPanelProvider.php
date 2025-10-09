@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\EventCalendarPage;
+use App\Filament\Pages\EventMapPage;
 use App\Filament\Resources\CategoryResource;
 use App\Filament\Resources\EventResource;
 use Filament\Http\Middleware\Authenticate;
@@ -25,7 +27,6 @@ class AppPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('app')
             ->path('app')
             ->login()
@@ -42,12 +43,14 @@ class AppPanelProvider extends PanelProvider
             ])
             //->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                //Pages\Dashboard::class,
+                EventCalendarPage::class,
+                EventMapPage::class,
             ])
             //->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                //Widgets\AccountWidget::class,
+                //Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

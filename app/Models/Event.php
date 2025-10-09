@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Concerns\HasOwner;
 use App\Observers\EventObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Mtvs\EloquentApproval\Approvable;
@@ -24,6 +26,8 @@ class Event extends Model
 
     use Approvable;
 
+    use HasOwner;
+
     // @see App\Filament\Resources\EventResource metodo getEloquentQuery()
     //public $approvalScopeDisabled = true;
 
@@ -35,6 +39,7 @@ class Event extends Model
         'end_at',
         'latitude',
         'longitude',
+        'owner_id',
     ];
 
     protected function casts(): array

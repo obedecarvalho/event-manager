@@ -15,27 +15,7 @@ class DevSeeder extends Seeder
     public function run(): void
     {
 
-        $this->command->info('Creating Categories...');
-        /*Category::factory()
-            ->count(10)
-            ->create();*/
-
         $this->command->info('Creating Events...');
-        /*
-        $events = Event::factory()
-            ->count(20)
-            ->create();
-
-        $events = $events->concat(Event::factory()
-            ->count(20)
-            ->approved()
-            ->create());
-
-        $events = $events->concat(Event::factory()
-            ->count(10)
-            ->rejected()
-            ->create());
-        */
         $events = Event::factory()
             ->count(100)
             ->withRandomApprovalState()

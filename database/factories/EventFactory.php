@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use DateInterval;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Mtvs\EloquentApproval\ApprovalFactoryStates;
@@ -33,6 +34,7 @@ class EventFactory extends Factory
             'end_at' => $end_at,
             'latitude' => fake()->latitude(max: -21.21, min: -21.27),
             'longitude' => fake()->longitude(max: -44.965, min:-45.02),
+            'owner_id' => User::inRandomOrder()->first()->id,
         ];
     }
 

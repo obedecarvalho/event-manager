@@ -12,8 +12,7 @@ class CustomLogoutResponse implements LogoutResponse
     {
 
         return redirect()->to(
-            //TODO: use this: route('filament.public.home')
-            route('filament.app.auth.login')
+            route('filament.public.home')
         );
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\EventCalendarPage;
+use App\Filament\Pages\EventMapPage;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -34,7 +36,9 @@ class PublicPanelProvider extends PanelProvider
             ])
             //->discoverPages(in: app_path('Filament/Public/Pages'), for: 'App\\Filament\\Public\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                //Pages\Dashboard::class,
+                EventCalendarPage::class,
+                EventMapPage::class,
             ])
             //->discoverWidgets(in: app_path('Filament/Public/Widgets'), for: 'App\\Filament\\Public\\Widgets')
             ->widgets([

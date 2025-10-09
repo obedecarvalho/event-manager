@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Filament\Widgets\EventMapWidget;
 use App\Models\Event;
+use Illuminate\Support\Facades\Cache;
 
 class EventObserver
 {
@@ -11,7 +13,7 @@ class EventObserver
      */
     public function created(Event $event): void
     {
-        //
+        $this->clearCache();
     }
 
     /**
@@ -19,7 +21,7 @@ class EventObserver
      */
     public function updated(Event $event): void
     {
-        //
+        $this->clearCache();
     }
 
     /**
@@ -27,7 +29,7 @@ class EventObserver
      */
     public function deleted(Event $event): void
     {
-        //
+        $this->clearCache();
     }
 
     /**
@@ -35,7 +37,7 @@ class EventObserver
      */
     public function restored(Event $event): void
     {
-        //
+        $this->clearCache();
     }
 
     /**
@@ -43,11 +45,12 @@ class EventObserver
      */
     public function forceDeleted(Event $event): void
     {
-        //
+        $this->clearCache();
     }
 
     public function rejected(Event $event): void
     {
+        $this->clearCache();
         activity()
             ->causedBy(auth()->user())
             ->performedOn($event)
@@ -57,10 +60,16 @@ class EventObserver
 
     public function approved(Event $event): void
     {
+        $this->clearCache();
         activity()
             ->causedBy(auth()->user())
             ->performedOn($event)
             ->event('approved')
             ->log(__('Approved'));
+    }
+
+    private function clearCache(): void
+    {
+        Cache::forget(EventMapWidget::CACHE_KEY);
     }
 }

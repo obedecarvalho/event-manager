@@ -227,5 +227,18 @@
   "Pending" : "Pendente",
   "Approval status" : "Status avaliação",
   "Approval at" : "Avaliado em",
+  "Prev" : "Anterior",
+  "Day" : "Dia",
+  "Today" : "Hoje",
+  "List" : "Lista",
+  "Month" : "Mês",
+  "Next" : "Próximo",
+  "Week" : "Semana",
+  "My Events" : "Meus Eventos",
+  "Details" : "Detalhes",
+  "Location": "Local",
+  "Owner": "Pertence a",
+  "Events Calendar": "Calendário de Eventos",
+  "Event Map": "Mapa de Eventos",
   "Administration": "Administração"
 }

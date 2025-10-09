@@ -8,7 +8,9 @@
     "require": {
         "php": "^8.2",
         "bezhansalleh/filament-panel-switch": "^1.1",
+        "dotswan/filament-map-picker": "^1.8",
         "filament/filament": "^3.3",
+        "guava/calendar": "^1.14",
         "guava/filament-modal-relation-managers": "^1.4",
         "laravel/framework": "^12.0",
         "laravel/pulse": "^1.4",
@@ -16,7 +18,8 @@
         "mtvs/eloquent-approval": "^5.2",
         "rmsramos/activitylog": "^2.0",
         "spatie/laravel-activitylog": "^4.10",
-        "spatie/laravel-permission": "^6.21"
+        "spatie/laravel-permission": "^6.21",
+        "webbingbrasil/filament-maps": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

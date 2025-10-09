@@ -14,7 +14,8 @@ class EventPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Roles::getRolesContentManager());
+        //return $user->hasRole(Roles::getRolesContentManager());
+        return true;
     }
 
     /**
@@ -22,7 +23,7 @@ class EventPolicy
      */
     public function view(User $user, Event $event): bool
     {
-        return $user->hasRole(Roles::getRolesContentManager());
+        return $user->hasRole(Roles::getRolesContentManager()) || $event->owner_id === $user->id;
     }
 
     /**
@@ -30,7 +31,8 @@ class EventPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(Roles::getRolesContentManager());
+        //return $user->hasRole(Roles::getRolesContentManager());
+        return true;
     }
 
     /**
@@ -38,7 +40,7 @@ class EventPolicy
      */
     public function update(User $user, Event $event): bool
     {
-        return $user->hasRole(Roles::getRolesContentManager());
+        return $user->hasRole(Roles::getRolesContentManager()) || $event->owner_id === $user->id;
     }
 
     /**
@@ -46,7 +48,7 @@ class EventPolicy
      */
     public function delete(User $user, Event $event): bool
     {
-        return $user->hasRole(Roles::getRolesContentManager());
+        return $user->hasRole(Roles::getRolesContentManager()) || $event->owner_id === $user->id;
     }
 
     /**

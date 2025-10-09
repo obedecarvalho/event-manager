@@ -8,9 +8,12 @@ use App\Filament\Tables\Columns\ApprovalBadgeColumn;
 use App\Filament\Tables\Columns\ApprovalIconColumn;
 use App\Filament\Tables\Filters\ApprovalFilter;
 use App\Models\Event;
+use App\Support\Enum\Roles;
 use Carbon\Carbon;
+use Dotswan\MapPicker\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -46,32 +49,69 @@ class EventResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->columnSpanFull()
-                    ->required(),
-                Forms\Components\RichEditor::make('description')
-                    ->columnSpanFull()
-                    ->required(),
-                Forms\Components\Toggle::make('is_public')
-                    ->label(__('Public'))
-                    ->columnSpanFull()
-                    ->required(),
-                Forms\Components\DateTimePicker::make('start_at')
-                    ->required()
-                    ->timezone('America/Sao_Paulo')
-                    ->seconds(false),
-                Forms\Components\DateTimePicker::make('end_at')
-                    ->required()
-                    ->seconds(false)
-                    ->timezone('America/Sao_Paulo')
-                    ->after('start_at'),
-                Forms\Components\Select::make('categories')
-                    ->relationship('categories', 'description')
-                    ->required()
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
-            ]);
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Informações')
+                        ->description('Informe sobre o Agente')
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->columnSpanFull()
+                                ->required(),
+                            Forms\Components\RichEditor::make('description')
+                                ->columnSpanFull()
+                                ->required(),
+                            Forms\Components\Toggle::make('is_public')
+                                ->label(__('Public'))
+                                ->columnSpanFull()
+                                ->required(),
+                            Forms\Components\DateTimePicker::make('start_at')
+                                ->required()
+                                ->timezone('America/Sao_Paulo')
+                                ->seconds(false),
+                            Forms\Components\DateTimePicker::make('end_at')
+                                ->required()
+                                ->seconds(false)
+                                ->timezone('America/Sao_Paulo')
+                                ->after('start_at'),
+                            Forms\Components\Select::make('categories')
+                                ->relationship('categories', 'description')
+                                ->required()
+                                ->multiple()
+                                ->preload()
+                                ->searchable(),
+                        ]),
+                    Forms\Components\Wizard\Step::make('Endereço')
+                        ->description('Informe o Endereço do Agente')
+                        ->schema([
+                            Forms\Components\Hidden::make('latitude'),
+                            Forms\Components\Hidden::make('longitude'),
+                            Map::make('location')
+                                ->label('Selecione a Localização')
+                                //->columnSpanFull()
+                                ->defaultLocation(latitude: config('app-custom.map.location')[0], longitude: config('app-custom.map.location')[1])
+                                ->draggable(true)
+                                ->clickable(true)
+                                ->zoom(config('app-custom.map.zoom'))
+                                ->showFullscreenControl(false)
+                                ->showMyLocationButton(false)
+                                ->extraTileControl([ 
+                                    'tileSize' => 256,
+                                    'zoomOffset' => 0,
+                                    ]
+                                )->afterStateHydrated(
+                                    function (Set $set, $record) {
+                                        $set('location', ['lat' => $record?->latitude, 'lng' => $record?->longitude]);
+                                    }
+                                )->afterStateUpdated(
+                                    function (Set $set, $state) {
+                                        $set('latitude', $state['lat']);
+                                        $set('longitude', $state['lng']);
+                                    }
+                                )
+                                ,
+                        ]),
+                ]),
+            ])
+            ->columns(null);
     }
 
     public static function table(Table $table): Table
@@ -79,6 +119,7 @@ class EventResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
@@ -92,7 +133,8 @@ class EventResource extends Resource
 
                         // Only render the tooltip if the column content exceeds the length limit.
                         return $state;
-                    }),
+                    })
+                    ->html(),
                 Tables\Columns\BadgeColumn::make('categories.description')
                     ->limitList(3),
                 Tables\Columns\ToggleColumn::make('is_public')
@@ -136,11 +178,14 @@ class EventResource extends Resource
                     ->label(__('Approval status'))
                     ->alignCenter(),
                 */
-                Tables\Columns\TextColumn::make('latitude')
+                /*Tables\Columns\TextColumn::make('latitude')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('longitude')
                     ->numeric()
+                    ->sortable(),*/
+                Tables\Columns\TextColumn::make('owner.email')
+                    ->label(__('Owner'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -210,11 +255,14 @@ class EventResource extends Resource
                 ApprovalFilter::make('approval_status')
                     ->multiple()
                     ->label(__('Approval status')),
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->visible(auth()->user()->hasRole(Roles::getRolesContentManager())),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -244,10 +292,26 @@ class EventResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
+        if (auth()->user()->hasRole(Roles::getRolesContentManager())){
+            return parent::getEloquentQuery()
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                    ApprovalScope::class,
+                ]);
+        }
         return parent::getEloquentQuery()
+            ->where('owner_id', auth()->user()->id)
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
                 ApprovalScope::class,
             ]);
+    }
+    
+    public static function getNavigationLabel(): string
+    {
+        if (auth()->user()->hasRole(Roles::getRolesContentManager())){
+            return __('Events');
+        }
+        return __('My Events');
     }
 }
