@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Concerns\WithRandomApprovalState;
 use App\Models\User;
 use DateInterval;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -14,6 +15,8 @@ use Mtvs\EloquentApproval\ApprovalStatuses;
 class EventFactory extends Factory
 {
     use ApprovalFactoryStates;
+
+    use WithRandomApprovalState;
     
     /**
      * Define the model's default state.
@@ -38,6 +41,7 @@ class EventFactory extends Factory
         ];
     }
 
+    /*
     public function withRandomApprovalState()
 	{
 		return $this->state(function ()
@@ -46,4 +50,5 @@ class EventFactory extends Factory
 			return $this->approvalState($status);
 		});
 	}
+    */
 }
