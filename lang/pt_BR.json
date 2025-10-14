@@ -243,5 +243,10 @@
   "Owner": "Pertence a",
   "Events Calendar": "Calendário de Eventos",
   "Event Map": "Mapa de Eventos",
+  "Registration approved" : "Cadastro aprovado",
+  "Your :name registration has been approved." : "Seu cadastro :name foi aprovado.",
+  "Registration rejected" : "Cadastro rejeitado",
+  "Your :name registration has been rejected." : "Seu cadastro :name foi rejeitado.",
+  "Thanks": "Obrigado",
   "Administration": "Administração"
 }
