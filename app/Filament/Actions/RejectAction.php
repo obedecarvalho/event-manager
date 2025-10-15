@@ -2,10 +2,8 @@
 
 namespace App\Filament\Actions;
 
-use App\Mail\RegistrationRejected;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Mail;
 
 class RejectAction extends Action
 {
@@ -24,12 +22,6 @@ class RejectAction extends Action
                 ->success()
                 ->duration(3000)
                 ->send();
-            Notification::make()
-                ->title(__('Registration rejected'))
-                ->body(__('Your :name registration has been rejected.', ['name' => $this->record->name,]))
-                ->sendToDatabase($this->record->owner);
-            Mail::to($this->record->owner)
-                ->send(new RegistrationRejected($this->record));
         });
     }
 }

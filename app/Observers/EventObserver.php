@@ -3,8 +3,12 @@
 namespace App\Observers;
 
 use App\Filament\Widgets\EventMapWidget;
+use App\Mail\RegistrationApproved;
+use App\Mail\RegistrationRejected;
 use App\Models\Event;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 
 class EventObserver
 {
@@ -56,6 +60,12 @@ class EventObserver
             ->performedOn($event)
             ->event('rejected')
             ->log(__('Rejected'));
+        Notification::make()
+            ->title(__('Registration rejected'))
+            ->body(__('Your :name registration has been rejected.', ['name' => $event->name,]))
+            ->sendToDatabase($event->owner);
+        Mail::to($event->owner)
+            ->send(new RegistrationRejected($event));
     }
 
     public function approved(Event $event): void
@@ -66,6 +76,12 @@ class EventObserver
             ->performedOn($event)
             ->event('approved')
             ->log(__('Approved'));
+        Notification::make()
+            ->title(__('Registration approved'))
+            ->body(__('Your :name registration has been approved.', ['name' => $event->name,]))
+            ->sendToDatabase($event->owner);
+        Mail::to($event->owner)
+            ->send(new RegistrationApproved($event));
     }
 
     private function clearCache(): void
