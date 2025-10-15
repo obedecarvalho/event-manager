@@ -1,7 +1,5 @@
 
 - File upload
-- Send mail on approve/reject (with queues)
-- notification  on approve/reject
 - metadatas
 - cookie consent
 - dashboard with graphs
@@ -9,3 +7,5 @@
 - cache with redis?
 - 2fa (fortify)
 - tests
+- exports
+- impersonate
